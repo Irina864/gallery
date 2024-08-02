@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const path = 'https://api.thecatapi.com';
+const key =
+  'live_qdLlUC0DIEZP6VPEarNCdjPnceI65vk3ONbX74t1ZkMKBPfVU0YuKmObWudfllAb';
 
 export const getData = createAsyncThunk(
   'images/getData',
@@ -22,26 +24,109 @@ export const getData = createAsyncThunk(
   }
 );
 
+export const postFavourites = createAsyncThunk(
+  'images/postFavourites',
+  async ({ imageId, subId }, thunkAPI) => {
+    try {
+      const response = await fetch(`${path}/v1/favourites`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+        },
+        body: JSON.stringify({
+          image_id: imageId,
+          sub_id: subId,
+        }),
+      });
+      if (response.ok) {
+        const favouritesData = await response.json();
+        return favouritesData;
+      } else {
+        throw new Error('Failed to post data about favourite image');
+      }
+    } catch (error) {
+      console.error(error);
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const getFavourites = createAsyncThunk(
+  'images/getFavourites',
+  async (_, thunkAPI) => {
+    try {
+      const response = await fetch(`${path}/v1/favourites`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+        },
+      });
+      if (response.ok) {
+        const favouritesData = await response.json();
+        return favouritesData;
+      } else {
+        throw new Error('Failed to get data about favourite images');
+      }
+    } catch (error) {
+      console.error(error);
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const deleteFavourites = createAsyncThunk(
+  'images/deleteFavourites',
+  async (favouriteId, thunkAPI) => {
+    try {
+      const response = await fetch(`${path}/v1/favourites/${favouriteId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+        },
+      });
+      if (response.ok) {
+        return favouriteId;
+      } else {
+        throw new Error('Failed to delete data about favourite image');
+      }
+    } catch (error) {
+      console.error(error);
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const removeImage = createAsyncThunk(
+  'images/removeImage',
+  async (imageId, thunkAPI) => {
+    try {
+      const response = await fetch(`${path}/v1/images/${imageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+        },
+      });
+      if (response.ok) {
+        return imageId;
+      } else {
+        const error = await response.json();
+        return thunkAPI.rejectWithValue(error);
+      }
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 const imagesSlice = createSlice({
   name: 'images',
   initialState: {
     data: [],
     isLoading: false,
     favourites: [],
-  },
-  reducers: {
-    deleteImageById(state, action) {
-      const idToDelete = action.payload;
-      state.data = state.data.filter((image) => image.id !== idToDelete);
-    },
-    addToFavourites(state, action) {
-      const { image } = action.payload;
-      state.favourites.push(image);
-    },
-    deleteFromFavourites(state, action) {
-      const { favId } = action.payload;
-      state.favourites = state.favourites.filter((image) => image.id !== favId);
-    },
   },
   extraReducers: (builder) => {
     builder.addCase(getData.pending, (state, action) => {
@@ -55,10 +140,44 @@ const imagesSlice = createSlice({
       state.isLoading = false;
       console.log('Fetch error');
     });
+
+    builder.addCase(postFavourites.fulfilled, (state, action) => {
+      state.favourites.push(action.payload);
+    });
+    builder.addCase(postFavourites.rejected, (state, action) => {
+      console.log('Fail to post favourite image:', action.payload);
+    });
+
+    builder.addCase(getFavourites.pending, (state, action) => {
+      state.isLoading = true;
+    });
+    builder.addCase(getFavourites.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.favourites = action.payload;
+    });
+    builder.addCase(getFavourites.rejected, (state, action) => {
+      state.isLoading = false;
+      console.log('Fail to get favourites');
+    });
+
+    builder.addCase(deleteFavourites.fulfilled, (state, action) => {
+      state.favourites = state.favourites.filter(
+        (favourite) => favourite.id !== action.payload
+      );
+    });
+    builder.addCase(deleteFavourites.rejected, (state, action) => {
+      console.log('Fail to delete favourites');
+    });
+
+    builder.addCase(removeImage.fulfilled, (state, action) => {
+      state.data = state.data.filter(
+        (image) => image.id !== action.payload.imageId
+      );
+    });
+    builder.addCase(removeImage.rejected, (state, action) => {
+      console.log('Fail to delete image');
+    });
   },
 });
-
-export const { deleteImageById, addToFavourites, deleteFromFavourites } =
-  imagesSlice.actions;
 
 export default imagesSlice.reducer;

@@ -4,24 +4,33 @@ import deleteIcon from '../../images/icon-delete.png';
 import './Card.css';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  deleteFromFavourites,
-  addToFavourites,
-  deleteImageById,
+  removeImage,
+  postFavourites,
+  getFavourites,
 } from '../../store/imagesSlice';
 
-function Card({ id, src, alt }) {
+function Card({ id, src, alt, onDelete }) {
   const dispatch = useDispatch();
   const favourites = useSelector((state) => state.images.favourites);
   const isFavourite = favourites && favourites.some((image) => image.id === id);
 
   const handleLiked = () => {
-    isFavourite
-      ? dispatch(deleteFromFavourites({ favId: id }))
-      : dispatch(addToFavourites({ image: { id, src } }));
+    if (isFavourite) {
+      onDelete(id);
+    } else {
+      dispatch(postFavourites({ imageId: id, subId: 'uniqueSubId' }))
+        .unwrap()
+        .then((data) => {
+          dispatch(getFavourites());
+        })
+        .catch((error) => {
+          console.error('Error post favourite: ', error);
+        });
+    }
   };
 
   const handleDelete = () => {
-    dispatch(deleteImageById(id));
+    dispatch(removeImage(id));
   };
 
   return (
