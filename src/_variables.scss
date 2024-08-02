@@ -28,18 +28,9 @@ $colorBorder: rgb(255, 255, 255);
   justify-content: $jc;
   align-items: $ai;
 }
-@mixin _laptop {
-  @media (max-width: 1200px) {
-    @content;
-  }
-}
-@mixin _tablet {
-  @media (max-width: 768px) {
-    @content;
-  }
-}
+
 @mixin _mobile {
-  @media (max-width: 425px) {
+  @media (max-width: 450px) {
     @content;
   }
 }
