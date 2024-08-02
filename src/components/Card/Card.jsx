@@ -7,7 +7,7 @@ import {
   postFavourites,
   getFavourites,
   deleteFavourites,
-  deleteImageById,
+  removeImage,
 } from '../../store/imagesSlice';
 
 function Card({ id, src, alt }) {
@@ -46,7 +46,7 @@ function Card({ id, src, alt }) {
   };
 
   const handleDelete = () => {
-    dispatch(deleteImageById(id));
+    dispatch(removeImage(id));
   };
 
   return (

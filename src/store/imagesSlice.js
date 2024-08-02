@@ -98,21 +98,36 @@ export const deleteFavourites = createAsyncThunk(
   }
 );
 
+export const removeImage = createAsyncThunk(
+  'images/removeImage',
+  async (imageId, thunkAPI) => {
+    try {
+      const response = await fetch(`${path}/v1/images/${imageId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': key,
+        },
+      });
+      if (response.ok) {
+        return imageId;
+      } else {
+        const error = await response.json();
+        return thunkAPI.rejectWithValue(error);
+      }
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+
 const imagesSlice = createSlice({
   name: 'images',
   initialState: {
     data: [],
     isLoading: false,
     favourites: [],
-  },
-  reducers: {
-    deleteImageById(state, action) {
-      const idToDelete = action.payload;
-      state.data = state.data.filter((image) => image.id !== idToDelete);
-      state.favourites = state.favourites.filter(
-        (image) => image.image_id !== idToDelete
-      );
-    },
   },
   extraReducers: (builder) => {
     builder.addCase(getData.pending, (state, action) => {
@@ -153,6 +168,15 @@ const imagesSlice = createSlice({
     });
     builder.addCase(deleteFavourites.rejected, (state, action) => {
       console.log('Fail to delete favourites');
+    });
+
+    builder.addCase(removeImage.fulfilled, (state, action) => {
+      state.data = state.data.filter(
+        (image) => image.id !== action.payload.imageId
+      );
+    });
+    builder.addCase(removeImage.rejected, (state, action) => {
+      console.log('Fail to delete image');
     });
   },
 });
