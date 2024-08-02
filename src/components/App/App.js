@@ -4,11 +4,7 @@ import Loading from '../Loading/Loading';
 import filterIcon from '../../images/icon-filter.png';
 import './App.css';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  deleteFavourites,
-  getData,
-  getFavourites,
-} from '../../store/imagesSlice';
+import { getData, getFavourites } from '../../store/imagesSlice';
 import { useState, useEffect } from 'react';
 
 function App() {
@@ -24,17 +20,6 @@ function App() {
   const [showFavoirites, setShowFavoirites] = useState(false);
   const handleFilter = () => {
     setShowFavoirites(!showFavoirites);
-  };
-
-  const handleDeleteFavourite = (favouriteId) => {
-    dispatch(deleteFavourites(favouriteId))
-      .unwrap()
-      .then(() => {
-        dispatch(getFavourites());
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   };
 
   return isLoading ? (
@@ -54,10 +39,10 @@ function App() {
           ? favourites.map((favourite) => (
               <Card
                 key={favourite.id}
-                id={favourite.id}
+                favId={favourite.id}
                 src={favourite.image.url}
+                id={favourite.image.id}
                 alt="fav cat image"
-                onDelete={() => handleDeleteFavourite(favourite.id)}
               />
             ))
           : data.map(({ id, url }) => (
