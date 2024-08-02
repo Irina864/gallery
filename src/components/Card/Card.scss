@@ -22,10 +22,22 @@
   .card__text {
     padding: 10px 20px;
     @include font($font1, 2rem, $colorText, 700);
-    .text__link {
-      color: $colorTextLink;
+    @include _mobile {
+      font-size: 1.5rem;
+    }
+    .card__link {
+      @include font($font1, 2rem, $colorTextLink, 700);
+      @include _mobile {
+        font-size: 1.5rem;
+      }
       &:hover {
         color: $colorText;
+      }
+    }
+    .card__tocopy {
+      @include font($font1, 1rem, $colorTextLink, 700);
+      @include _mobile {
+        font-size: 0.8rem;
       }
     }
   }
