@@ -28,9 +28,33 @@
   color: #ffffff;
   font-weight: 700;
 }
-.card .card__text .text__link {
-  color: #b9d2f7;
+@media (max-width: 450px) {
+  .card .card__text {
+    font-size: 1.5rem;
+  }
 }
-.card .card__text .text__link:hover {
+.card .card__text .card__link {
+  font-family: "Nunito", sans-serif;
+  font-size: 2rem;
+  color: #b9d2f7;
+  font-weight: 700;
+}
+@media (max-width: 450px) {
+  .card .card__text .card__link {
+    font-size: 1.5rem;
+  }
+}
+.card .card__text .card__link:hover {
   color: #ffffff;
+}
+.card .card__text .card__tocopy {
+  font-family: "Nunito", sans-serif;
+  font-size: 1rem;
+  color: #b9d2f7;
+  font-weight: 700;
+}
+@media (max-width: 450px) {
+  .card .card__text .card__tocopy {
+    font-size: 0.8rem;
+  }
 }/*# sourceMappingURL=Card.css.map */

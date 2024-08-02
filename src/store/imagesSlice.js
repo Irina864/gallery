@@ -1,8 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const path = 'https://api.thecatapi.com';
-const key =
-  'live_qdLlUC0DIEZP6VPEarNCdjPnceI65vk3ONbX74t1ZkMKBPfVU0YuKmObWudfllAb';
 
 export const getData = createAsyncThunk(
   'images/getData',
@@ -31,6 +29,20 @@ const imagesSlice = createSlice({
     isLoading: false,
     favourites: [],
   },
+  reducers: {
+    deleteImageById(state, action) {
+      const idToDelete = action.payload;
+      state.data = state.data.filter((image) => image.id !== idToDelete);
+    },
+    addToFavourites(state, action) {
+      const { image } = action.payload;
+      state.favourites.push(image);
+    },
+    deleteFromFavourites(state, action) {
+      const { favId } = action.payload;
+      state.favourites = state.favourites.filter((image) => image.id !== favId);
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(getData.pending, (state, action) => {
       state.isLoading = true;
@@ -45,5 +57,8 @@ const imagesSlice = createSlice({
     });
   },
 });
+
+export const { deleteImageById, addToFavourites, deleteFromFavourites } =
+  imagesSlice.actions;
 
 export default imagesSlice.reducer;
